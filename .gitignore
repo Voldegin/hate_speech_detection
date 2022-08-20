@@ -1,3 +1,4 @@
 !.gitignore
-.idea
+*.idea
 /notebooks/.ipynb_checkpoints/*
+*.egg-info
