@@ -18,7 +18,6 @@ check_text_model.add_argument('model', type=str, required=False,
 class CheckText(Resource):
     @api.expect(check_text_model)
     def post(self):
-        temp_img_dir = "tmp_img"
         try:
             args = check_text_model.parse_args()
             text = args['text']
