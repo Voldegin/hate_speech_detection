@@ -10,10 +10,10 @@ from api import api
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 api.init_app(blueprint)
 
-model_namespace = Namespace('Models')
+model_namespace = Namespace('models')
 model_namespace.add_resource(ShowModels, '/all_models')
 
-offline_namespace = Namespace('Offline')
+offline_namespace = Namespace('offline')
 offline_namespace.add_resource(CheckText, '/check_text')
 
 api.add_namespace(model_namespace)
