@@ -10,3 +10,4 @@ emoji==2.0.0
 nltk==3.7
 tensorflow_datasets==4.6.0
 nest_asyncio==1.5.5
+sqlalchemy==1.4.40

@@ -9,6 +9,7 @@ from api import api
 from config import MODEL_LIST, MODEL_PREDICTIONS
 from src.twitter.twitter_scraping import condition_based_scraping
 from src.utils.format_twitter_preds import format_predictions
+from src.db.db_operations import insert_live_scraping, delete_live_scraping
 
 MODEL_NAMES = [x["name"] for x in MODEL_LIST]
 MODEL_NAMES.sort(reverse=True)
@@ -29,6 +30,10 @@ condition_based_model.add_argument('end_date', type=str, required=False,
 live_check_post_model = reqparse.RequestParser()
 live_check_post_model.add_argument('username', type=str, required=True,
                                    help="Username of the twitter account")
+live_check_post_model.add_argument('model', type=str, required=True,
+                                   default=MODEL_NAMES[0],
+                                   help="Model to be called",
+                                   choices=MODEL_NAMES)
 live_check_post_model.add_argument('action', type=str, required=True,
                                    default='start',
                                    help="Start or stop twitter scraping",
@@ -85,7 +90,7 @@ class ConditionBased(Resource):
 
             result = format_predictions(full_data, predictions)
 
-            return result
+            return result.to_dict('records')
 
         except Exception as e:
             print(e)
@@ -101,11 +106,14 @@ class LiveCheck(Resource):
             args = live_check_post_model.parse_args()
             username = args['username']
             action = args['action']
+            model = args['model']
 
             if action == 'start':
-                return "Twitter scraping started for user: " + username
+                db_response, status_code = insert_live_scraping(username, model)
+                return db_response, status_code
             else:
-                return "Twitter scraping stopped for user: " + username
+                db_response, status_code = delete_live_scraping(username, model)
+                return db_response, status_code
 
         except Exception as e:
             print(e)

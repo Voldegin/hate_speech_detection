@@ -5,4 +5,4 @@ MODEL_LIST = load_models()
 
 MODEL_PREDICTIONS = {0: "Not bullying", 1: "Bullying"}
 
-initialize_db()
+DB_ENGINE = initialize_db()
