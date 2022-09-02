@@ -48,7 +48,7 @@ def load_distilbert_model():
 
 
 def load_models():
-    model_list = [load_xgb_model()]
-    # model_list = [load_roberta_model(), load_xgb_model(),
-    #               load_distilbert_model()]
+    # model_list = [load_xgb_model()]
+    model_list = [load_roberta_model(), load_xgb_model(),
+                  load_distilbert_model()]
     return model_list
