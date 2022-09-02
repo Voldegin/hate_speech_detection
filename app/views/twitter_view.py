@@ -1,6 +1,6 @@
 # Public Imports
 from flask import jsonify, make_response
-from flask_restx import Resource, reqparse
+from flask_restx import Resource, reqparse, inputs
 import traceback
 from dateutil.parser import parse
 
@@ -9,7 +9,8 @@ from api import api
 from config import MODEL_LIST, MODEL_PREDICTIONS
 from src.twitter.condition_scraping import condition_based_scraping
 from src.utils.format_twitter_preds import format_predictions
-from src.db.db_operations import insert_live_scraping, delete_live_scraping
+from src.db.db_operations import insert_live_scraping, delete_live_scraping, \
+    fetch_twitter_data
 
 MODEL_NAMES = [x["name"] for x in MODEL_LIST]
 MODEL_NAMES.sort(reverse=True)
@@ -42,6 +43,13 @@ live_check_post_model.add_argument('action', type=str, required=True,
 live_check_get_model = reqparse.RequestParser()
 live_check_get_model.add_argument('username', type=str, required=True,
                                   help="Username of the twitter account")
+live_check_get_model.add_argument('model', type=str, required=True,
+                                  default=MODEL_NAMES[0],
+                                  help="Model to be called",
+                                  choices=MODEL_NAMES)
+live_check_get_model.add_argument('show_all', type=inputs.boolean,
+                                  required=False, default=True,
+                                  help="Show all results or from last view")
 live_check_get_model.add_argument('limit', type=int, required=False,
                                   default=20,
                                   help="No of results from live scraping")
@@ -126,9 +134,14 @@ class LiveCheck(Resource):
         try:
             args = live_check_get_model.parse_args()
             username = args['username']
+            model = args['model']
             limit = args['limit']
+            show_all = args['show_all']
+            print(show_all)
 
-            return []
+            result = fetch_twitter_data(username, model, show_all, limit)
+
+            return result
 
         except Exception as e:
             print(e)

@@ -4,7 +4,8 @@ from dateutil.parser import parse
 from datetime import timedelta
 
 # Private Imports
-from src.db.db_operations import select_all_live_scraping, update_last_scrap, insert_data
+from src.db.db_operations import select_all_live_scraping, update_last_scrap, \
+    insert_data
 from src.twitter.condition_scraping import condition_based_scraping
 from config import MODEL_LIST, MODEL_PREDICTIONS
 from src.utils.format_twitter_preds import format_predictions
@@ -43,10 +44,10 @@ def live_scraping():
         if last_scrapped_time:
             start_date = last_scrapped_time
 
-        print(start_date)
+        tweets, full_data = condition_based_scraping(username,
+                                                     start_date=start_date)
+        print("\n\n", len(full_data), "\n\n")
 
-        tweets, full_data = condition_based_scraping(username, start_date=start_date)
-        print(full_data.empty)
         if not full_data.empty:
             model_details = [x for x in MODEL_LIST if x["name"] == model]
             if not model_details:
@@ -66,8 +67,6 @@ def live_scraping():
             last_date = parse(full_data['date'].max()) + timedelta(seconds=1)
             update_last_scrap(username, model, last_date)
 
-    print("\n")
-
 
 def initialise_live_scraping():
-    cancel_future_calls = call_repeatedly(5, live_scraping)
+    cancel_future_calls = call_repeatedly(25, live_scraping)

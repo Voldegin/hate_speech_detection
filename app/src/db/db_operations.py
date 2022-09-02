@@ -3,7 +3,9 @@ from datetime import datetime
 
 # Private Imports
 from config import DB_ENGINE
-from src.db.db_queries import LIVE_SCRAP_CHECK, INSERT_LIVE, DELETE_LIVE, SELECT_ALL_LIVE, UPDATE_LAST_SCRAP
+from src.db.db_queries import LIVE_SCRAP_CHECK, INSERT_LIVE, DELETE_LIVE, \
+    SELECT_ALL_LIVE, UPDATE_LAST_SCRAP, LAST_VIEW_QUERY, FETCH_QUERY, \
+    UPDATE_LAST_VIEW
 
 
 def format_db_result(result):
@@ -56,6 +58,33 @@ def select_all_live_scraping():
     return data
 
 
-def update_last_scrap(username,model,last_date):
-    update_query = UPDATE_LAST_SCRAP.format(username=username, model=model,last_scrapped_time=last_date)
+def update_last_scrap(username, model, last_date):
+    update_query = UPDATE_LAST_SCRAP.format(username=username, model=model,
+                                            last_scrapped_time=last_date)
     DB_ENGINE.execute(update_query)
+
+
+def fetch_twitter_data(username, model, show_all, limit):
+    last_view_time = None
+    if not show_all:
+        last_view_query = LAST_VIEW_QUERY.format(username=username, model=model)
+        last_view_time = DB_ENGINE.execute(last_view_query)
+        last_view_time = format_db_result(last_view_time)[0]["last_view_time"]
+        if last_view_time == "None":
+            last_view_time = None
+
+    fetch_query = FETCH_QUERY.format(username=username, model=model)
+    if last_view_time:
+        fetch_query += f" and date >= '{last_view_time}'"
+    fetch_query += " limit " + str(limit)
+
+    result = DB_ENGINE.execute(fetch_query)
+    data = format_db_result(result)
+
+    # update last view
+    new_last_view = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    update_query = UPDATE_LAST_VIEW.format(username=username, model=model,
+                                           last_viewed_time=new_last_view)
+    DB_ENGINE.execute(update_query)
+
+    return data
