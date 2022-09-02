@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS twitter_data;
+
+CREATE TABLE twitter_data (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+username VARCHAR NOT NULL,
+date VARCHAR,
+text VARCHAR,
+prediction INT
+);
