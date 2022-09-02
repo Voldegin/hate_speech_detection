@@ -6,3 +6,9 @@ INSERT_LIVE = """insert into live_scraping_details VALUES(null, '{username}',
 
 DELETE_LIVE = """delete from live_scraping_details 
 where username='{username}' and model='{model}'"""
+
+SELECT_ALL_LIVE = """select * from live_scraping_details"""
+
+UPDATE_LAST_SCRAP = """update live_scraping_details 
+set last_scrapped_time='{last_scrapped_time}' where username='{username}' 
+and model='{model}'"""

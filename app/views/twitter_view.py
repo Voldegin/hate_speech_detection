@@ -7,7 +7,7 @@ from dateutil.parser import parse
 # Private Imports
 from api import api
 from config import MODEL_LIST, MODEL_PREDICTIONS
-from src.twitter.twitter_scraping import condition_based_scraping
+from src.twitter.condition_scraping import condition_based_scraping
 from src.utils.format_twitter_preds import format_predictions
 from src.db.db_operations import insert_live_scraping, delete_live_scraping
 

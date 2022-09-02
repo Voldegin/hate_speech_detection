@@ -1,4 +1,5 @@
 # Public Imports
+import pandas as pd
 import twint
 import nest_asyncio
 
@@ -39,5 +40,8 @@ def condition_based_scraping(username, start_date=None, end_date=None):
 
     tweets_df = twint.storage.panda.Tweets_df
     columns = ['date', 'tweet']
+
+    if tweets_df.empty:
+        tweets_df = pd.DataFrame(columns=columns)
 
     return tweets_df['tweet'], tweets_df[columns]
