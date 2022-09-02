@@ -9,6 +9,10 @@ if platform == "darwin":
 else:
     platform_requires = ["tensorflow==2.8.2"]
 
+other_libraries = [
+    "twint@git+https://github.com/twintproject/twint.git"
+]
+
 entry_points = {
     'console_scripts': [
         'detect-hate-speech=main:main'
@@ -18,6 +22,6 @@ entry_points = {
 if __name__ == '__main__':
     setup(
         name='hate_speech_app',
-        install_requires=install_requires + platform_requires,
+        install_requires=install_requires + platform_requires + other_libraries,
         entry_points=entry_points
     )

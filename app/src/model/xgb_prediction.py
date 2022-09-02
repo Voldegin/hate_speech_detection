@@ -2,7 +2,7 @@
 import pandas as pd
 
 # Private Imports
-from src.model.predict_utils import clean_text
+from src.utils.predict_utils import clean_text
 
 
 def xgb_prediction(input_text, model_config, preprocess=True):

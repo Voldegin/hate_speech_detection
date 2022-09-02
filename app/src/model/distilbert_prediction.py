@@ -2,7 +2,7 @@
 import tensorflow as tf
 
 # Private Imports
-from src.model.predict_utils import clean_text
+from src.utils.predict_utils import clean_text
 
 
 def distilbert_prediction(input_text, model_config, preprocess=True,

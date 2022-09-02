@@ -1,6 +1,6 @@
 # Public Imports
 from flask import jsonify, make_response
-from flask_restx import Resource, reqparse, inputs
+from flask_restx import Resource, reqparse
 import traceback
 
 # Private Imports
@@ -36,9 +36,8 @@ class CheckText(Resource):
             model_func = model_details["function"]
             model_config = model_details["config"]
 
-            a = model_func(input_text=text, model_config=model_config)
-            print(a)
-            prediction = a[0]
+            result = model_func(input_text=text, model_config=model_config)
+            prediction = result[0]
 
             return MODEL_PREDICTIONS[prediction]
 

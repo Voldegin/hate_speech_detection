@@ -4,7 +4,7 @@ import tensorflow_datasets as tfds
 import tensorflow as tf
 
 # Private Imports
-from src.model.predict_utils import clean_text
+from src.utils.predict_utils import clean_text
 
 max_length = 128
 batch_size = 64
