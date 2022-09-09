@@ -12,6 +12,7 @@ from src.twitter.condition_scraping import condition_based_scraping
 from src.utils.format_twitter_preds import format_predictions
 from src.db.db_operations import insert_live_scraping, delete_live_scraping, \
     fetch_twitter_data
+from log import logger
 
 MODEL_NAMES = [x["name"] for x in MODEL_LIST]
 MODEL_NAMES.sort(reverse=True)
@@ -112,8 +113,8 @@ class ConditionBased(Resource):
             return result.to_dict('records')
 
         except Exception as e:
-            print(e)
-            print(traceback.format_exc())
+            logger.error(e)
+            logger.info(traceback.format_exc())
             error_json = {"Error": "Error in ConditionBased POST", "msg": ""}
             return make_response(jsonify(error_json), 500)
 
@@ -135,8 +136,8 @@ class LiveCheck(Resource):
                 return db_response, status_code
 
         except Exception as e:
-            print(e)
-            print(traceback.format_exc())
+            logger.error(e)
+            logger.info(traceback.format_exc())
             error_json = {"Error": "Error in LiveCheck POST"}
             return make_response(jsonify(error_json), 500)
 
@@ -148,14 +149,14 @@ class LiveCheck(Resource):
             model = args['model']
             limit = args['limit']
             show_all = args['show_all']
-            print(show_all)
+            logger.info(show_all)
 
             result = fetch_twitter_data(username, model, show_all, limit)
 
             return result
 
         except Exception as e:
-            print(e)
-            print(traceback.format_exc())
+            logger.error(e)
+            logger.info(traceback.format_exc())
             error_json = {"Error": "Error in LiveCheck GET"}
             return make_response(jsonify(error_json), 500)

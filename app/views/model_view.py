@@ -5,6 +5,7 @@ import traceback
 
 # Private Imports
 from config import MODEL_LIST
+from log import logger
 
 
 class ShowModels(Resource):
@@ -14,7 +15,7 @@ class ShowModels(Resource):
             return model_names
 
         except Exception as e:
-            print(e)
-            print(traceback.format_exc())
+            logger.error(e)
+            logger.info(traceback.format_exc())
             error_json = {"Error": "Error in ShowModels GET"}
             return make_response(jsonify(error_json), 500)

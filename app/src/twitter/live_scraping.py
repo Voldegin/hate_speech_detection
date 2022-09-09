@@ -9,6 +9,7 @@ from src.db.db_operations import select_all_live_scraping, update_last_scrap, \
 from src.twitter.condition_scraping import condition_based_scraping
 from config import MODEL_LIST, MODEL_PREDICTIONS
 from src.utils.format_twitter_preds import format_predictions
+from log import logger
 
 
 def call_repeatedly(interval, func):
@@ -24,10 +25,10 @@ def call_repeatedly(interval, func):
 
 
 def live_scraping():
-    print("Live Scrapping started")
+    logger.info("Live Scraping being done")
     data = select_all_live_scraping()
     for each_row in data:
-        print(each_row)
+        logger.info(each_row)
         username = each_row["username"]
         model = each_row["model"]
         start_date = each_row["start_date"]
@@ -42,9 +43,9 @@ def live_scraping():
 
         code, tweets, full_data = condition_based_scraping(username,
                                                            start_date=start_date)
-        print("\n\n", len(full_data), "\n\n")
+        logger.info("\n\n", len(full_data), "\n\n")
         if code != 200:
-            print("Failed scraping during live scrap")
+            logger.info("Failed scraping during live scrap")
 
         if not full_data.empty and code == 200:
             model_details = [x for x in MODEL_LIST if x["name"] == model]

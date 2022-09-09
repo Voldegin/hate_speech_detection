@@ -6,6 +6,7 @@ import traceback
 # Private Imports
 from api import api
 from config import MODEL_LIST, MODEL_PREDICTIONS
+from log import logger
 
 MODEL_NAMES = [x["name"] for x in MODEL_LIST]
 MODEL_NAMES.sort(reverse=True)
@@ -42,7 +43,7 @@ class CheckText(Resource):
             return MODEL_PREDICTIONS[prediction]
 
         except Exception as e:
-            print(e)
-            print(traceback.format_exc())
+            logger.error(e)
+            logger.info(traceback.format_exc())
             error_json = {"Error": "Error in CheckText POST"}
             return make_response(jsonify(error_json), 500)

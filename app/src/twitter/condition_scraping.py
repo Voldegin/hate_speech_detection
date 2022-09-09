@@ -1,9 +1,11 @@
 # Public Imports
 import traceback
-
 import pandas as pd
 import twint
 import nest_asyncio
+
+# Private Imports
+from log import logger
 
 nest_asyncio.apply()
 
@@ -19,8 +21,8 @@ def condition_based_scraping(username, start_date=None, end_date=None):
         if end_date:
             c.Until = end_date
 
-        print(start_date)
-        print(end_date)
+        logger.info(start_date)
+        logger.info(end_date)
 
         # c.Limit = 2
 
@@ -54,6 +56,6 @@ def condition_based_scraping(username, start_date=None, end_date=None):
         if "Cannot find twitter account with name" in str(e):
             return 400, "Twitter username not found", -1
     except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+        logger.info(e)
+        logger.info(traceback.format_exc())
         return 500, "Error while fetching tweets", -1
