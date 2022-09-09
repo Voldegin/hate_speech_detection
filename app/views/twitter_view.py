@@ -3,6 +3,7 @@ from flask import jsonify, make_response
 from flask_restx import Resource, reqparse, inputs
 import traceback
 from dateutil.parser import parse
+from datetime import datetime, timedelta
 
 # Private Imports
 from api import api
@@ -58,6 +59,7 @@ live_check_get_model.add_argument('limit', type=int, required=False,
 class ConditionBased(Resource):
     @api.expect(condition_based_model)
     def post(self):
+        error_json = {"Error": "Error in ConditionBased POST", "msg": ""}
         try:
             args = condition_based_model.parse_args()
             username = args['username']
@@ -65,13 +67,16 @@ class ConditionBased(Resource):
             raw_start_date = args['start_date']
             raw_end_date = args['end_date']
 
+            today = datetime.today()
+
             if raw_start_date:
                 try:
                     start_date = str(parse(raw_start_date))
                 except ValueError:
                     return "Invalid start date", 400
             else:
-                start_date = None
+                start_date = (today - timedelta(weeks=1)).strftime(
+                    '%Y-%m-%d %H:%M:%S')
 
             if raw_end_date:
                 try:
@@ -79,7 +84,7 @@ class ConditionBased(Resource):
                 except ValueError:
                     return "Invalid end date", 400
             else:
-                end_date = None
+                end_date = today.strftime('%Y-%m-%d %H:%M:%S')
 
             model_details = [x for x in MODEL_LIST if x["name"] == model]
             if not model_details:
@@ -89,9 +94,15 @@ class ConditionBased(Resource):
             model_func = model_details["function"]
             model_config = model_details["config"]
 
-            tweets, full_data = condition_based_scraping(username,
-                                                         start_date=start_date,
-                                                         end_date=end_date)
+            code, tweets, full_data = condition_based_scraping(username,
+                                                               start_date=start_date,
+                                                               end_date=end_date)
+            if code != 200:
+                error_json["msg"] = tweets
+                return make_response(jsonify(error_json), 400)
+
+            if len(tweets) == 0:
+                return "No tweets found for the give parameters", 200
 
             predictions = model_func(input_text=tweets,
                                      model_config=model_config)
@@ -103,7 +114,7 @@ class ConditionBased(Resource):
         except Exception as e:
             print(e)
             print(traceback.format_exc())
-            error_json = {"Error": "Error in ConditionBased POST"}
+            error_json = {"Error": "Error in ConditionBased POST", "msg": ""}
             return make_response(jsonify(error_json), 500)
 
 

@@ -24,7 +24,7 @@ def call_repeatedly(interval, func):
 
 
 def live_scraping():
-    print("Hello")
+    print("Live Scrapping started")
     data = select_all_live_scraping()
     for each_row in data:
         print(each_row)
@@ -36,24 +36,19 @@ def live_scraping():
             last_scrapped_time = None
         else:
             last_scrapped_time = each_row["last_scrapped_time"]
-        if each_row["last_viewed_time"] == "None":
-            last_viewed_time = None
-        else:
-            last_viewed_time = each_row["last_viewed_time"]
 
         if last_scrapped_time:
             start_date = last_scrapped_time
 
-        tweets, full_data = condition_based_scraping(username,
-                                                     start_date=start_date)
+        code, tweets, full_data = condition_based_scraping(username,
+                                                           start_date=start_date)
         print("\n\n", len(full_data), "\n\n")
+        if code != 200:
+            print("Failed scraping during live scrap")
 
-        if not full_data.empty:
+        if not full_data.empty and code == 200:
             model_details = [x for x in MODEL_LIST if x["name"] == model]
-            if not model_details:
-                return "Model not found", 400
-            else:
-                model_details = model_details[0]
+            model_details = model_details[0]
             model_func = model_details["function"]
             model_config = model_details["config"]
 
