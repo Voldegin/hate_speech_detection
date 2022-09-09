@@ -11,7 +11,7 @@ from config import MODEL_LIST, MODEL_PREDICTIONS
 from src.twitter.condition_scraping import condition_based_scraping
 from src.utils.format_twitter_preds import format_predictions
 from src.db.db_operations import insert_live_scraping, delete_live_scraping, \
-    fetch_twitter_data
+    fetch_twitter_data, select_all_live_scraping
 from log import logger
 
 MODEL_NAMES = [x["name"] for x in MODEL_LIST]
@@ -119,7 +119,7 @@ class ConditionBased(Resource):
             return make_response(jsonify(error_json), 500)
 
 
-class LiveCheck(Resource):
+class LiveScrap(Resource):
     @api.expect(live_check_post_model)
     def post(self):
         try:
@@ -138,9 +138,24 @@ class LiveCheck(Resource):
         except Exception as e:
             logger.error(e)
             logger.info(traceback.format_exc())
-            error_json = {"Error": "Error in LiveCheck POST"}
+            error_json = {"Error": "Error in LiveScrap POST"}
             return make_response(jsonify(error_json), 500)
 
+    @api.expect(None)
+    def get(self):
+        try:
+            result = select_all_live_scraping()
+
+            return result
+
+        except Exception as e:
+            logger.error(e)
+            logger.info(traceback.format_exc())
+            error_json = {"Error": "Error in LiveScrap GET"}
+            return make_response(jsonify(error_json), 500)
+
+
+class ScrapResults(Resource):
     @api.expect(live_check_get_model)
     def get(self):
         try:
@@ -158,5 +173,5 @@ class LiveCheck(Resource):
         except Exception as e:
             logger.error(e)
             logger.info(traceback.format_exc())
-            error_json = {"Error": "Error in LiveCheck GET"}
+            error_json = {"Error": "Error in LiveScrap GET"}
             return make_response(jsonify(error_json), 500)

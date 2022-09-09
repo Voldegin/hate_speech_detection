@@ -41,9 +41,11 @@ def live_scraping():
         if last_scrapped_time:
             start_date = last_scrapped_time
 
+        logger.info("Live scraping for username: " + username)
+        logger.info("Username: " + username)
         code, tweets, full_data = condition_based_scraping(username,
                                                            start_date=start_date)
-        logger.info("\n\n", len(full_data), "\n\n")
+        logger.info("Length of data: " + str(len(full_data)))
         if code != 200:
             logger.info("Failed scraping during live scrap")
 
