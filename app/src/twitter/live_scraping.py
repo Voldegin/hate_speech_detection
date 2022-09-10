@@ -6,7 +6,7 @@ from datetime import timedelta
 # Private Imports
 from src.db.db_operations import select_all_live_scraping, update_last_scrap, \
     insert_data
-from src.twitter.condition_scraping import condition_based_scraping
+from src.twitter.condition_scraping import fetch_tweet_data
 from config import MODEL_LIST, MODEL_PREDICTIONS
 from src.utils.format_twitter_preds import format_predictions
 from log import logger
@@ -32,19 +32,21 @@ def live_scraping():
         username = each_row["username"]
         model = each_row["model"]
         start_date = each_row["start_date"]
+        replies = each_row["replies"]
 
         if each_row["last_scrapped_time"] == "None":
             last_scrapped_time = None
         else:
             last_scrapped_time = each_row["last_scrapped_time"]
 
-        if last_scrapped_time:
+        if last_scrapped_time and not replies:
             start_date = last_scrapped_time
 
         logger.info("Live scraping for username: " + username)
         logger.info("Username: " + username)
-        code, tweets, full_data = condition_based_scraping(username,
-                                                           start_date=start_date)
+        code, tweets, full_data = fetch_tweet_data(username,
+                                                   start_date=start_date,
+                                                   replies=replies)
         logger.info("Length of data: " + str(len(full_data)))
         if code != 200:
             logger.info("Failed scraping during live scrap")

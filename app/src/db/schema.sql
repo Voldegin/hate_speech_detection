@@ -6,6 +6,7 @@ username TEXT NOT NULL,
 model TEXT,
 date TEXT,
 text TEXT,
+tweet_author TEXT,
 prediction INT
 );
 
@@ -16,6 +17,7 @@ id INTEGER PRIMARY KEY AUTOINCREMENT,
 username TEXT NOT NULL,
 model TEXT,
 start_date TEXT,
+replies BOOLEAN,
 last_scrapped_time TEXT,
 last_viewed_time TEXT
 );

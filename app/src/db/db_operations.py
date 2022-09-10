@@ -5,7 +5,7 @@ from datetime import datetime
 from config import DB_ENGINE
 from src.db.db_queries import LIVE_SCRAP_CHECK, INSERT_LIVE, DELETE_LIVE, \
     SELECT_ALL_LIVE, UPDATE_LAST_SCRAP, LAST_VIEW_QUERY, FETCH_QUERY, \
-    UPDATE_LAST_VIEW
+    UPDATE_LAST_VIEW, INSERT_DATA, CHECK_DATA
 
 
 def format_db_result(result):
@@ -20,12 +20,26 @@ def format_db_result(result):
 
 
 def insert_data(data, model, username):
-    data['username'] = username
-    data['model'] = model
-    data.to_sql('twitter_data', DB_ENGINE, if_exists='append', index=False)
+    for index, row in data.iterrows():
+        date = row['date']
+        text = row['text']
+        tweet_author = row['tweet_author']
+        prediction = row['prediction']
+        check_exist_query = CHECK_DATA.format(username=username, model=model,
+                                              date=date, text=text,
+                                              tweet_author=tweet_author)
+        check_exist = DB_ENGINE.execute(check_exist_query)
+        result = [row[0] for row in check_exist]
+        if result:
+            continue
+        insert_query = INSERT_DATA.format(username=username, model=model,
+                                          date=date, text=text,
+                                          tweet_author=tweet_author,
+                                          prediction=prediction)
+        DB_ENGINE.execute(insert_query)
 
 
-def insert_live_scraping(username, model):
+def insert_live_scraping(username, model, replies):
     check_exist_query = LIVE_SCRAP_CHECK.format(username=username, model=model)
     check_exist = DB_ENGINE.execute(check_exist_query)
     result = [row[0] for row in check_exist]
@@ -35,6 +49,7 @@ def insert_live_scraping(username, model):
     start_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     insert_query = INSERT_LIVE.format(username=username, model=model,
                                       start_date=start_date,
+                                      replies=replies,
                                       last_scrapped_time=None,
                                       last_viewed_time=None)
 
@@ -64,7 +79,7 @@ def update_last_scrap(username, model, last_date):
     DB_ENGINE.execute(update_query)
 
 
-def fetch_twitter_data(username, model, show_all, limit):
+def get_tweet_results(username, model, show_all, limit):
     last_view_time = None
     if not show_all:
         last_view_query = LAST_VIEW_QUERY.format(username=username, model=model)

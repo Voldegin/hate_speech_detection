@@ -8,10 +8,10 @@ from datetime import datetime, timedelta
 # Private Imports
 from api import api
 from config import MODEL_LIST, MODEL_PREDICTIONS
-from src.twitter.condition_scraping import condition_based_scraping
+from src.twitter.condition_scraping import fetch_tweet_data
 from src.utils.format_twitter_preds import format_predictions
 from src.db.db_operations import insert_live_scraping, delete_live_scraping, \
-    fetch_twitter_data, select_all_live_scraping
+    get_tweet_results, select_all_live_scraping
 from log import logger
 
 MODEL_NAMES = [x["name"] for x in MODEL_LIST]
@@ -29,6 +29,9 @@ condition_based_model.add_argument('start_date', type=str, required=False,
                                    help="Start date for checking tweets")
 condition_based_model.add_argument('end_date', type=str, required=False,
                                    help="End date for checking tweets")
+condition_based_model.add_argument('consider_replies', type=inputs.boolean,
+                                   required=False, default=False,
+                                   help="consider replies to tweets posted by username")
 
 live_check_post_model = reqparse.RequestParser()
 live_check_post_model.add_argument('username', type=str, required=True,
@@ -41,6 +44,9 @@ live_check_post_model.add_argument('action', type=str, required=True,
                                    default='start',
                                    help="Start or stop twitter scraping",
                                    choices=['start', 'stop'])
+live_check_post_model.add_argument('consider_replies', type=inputs.boolean,
+                                   required=False, default=False,
+                                   help="consider replies for live scraping")
 
 live_check_get_model = reqparse.RequestParser()
 live_check_get_model.add_argument('username', type=str, required=True,
@@ -67,8 +73,9 @@ class ConditionBased(Resource):
             model = args['model']
             raw_start_date = args['start_date']
             raw_end_date = args['end_date']
+            replies = args['consider_replies']
 
-            today = datetime.today()
+            today = datetime.today() + timedelta(days=1)
 
             if raw_start_date:
                 try:
@@ -95,9 +102,10 @@ class ConditionBased(Resource):
             model_func = model_details["function"]
             model_config = model_details["config"]
 
-            code, tweets, full_data = condition_based_scraping(username,
-                                                               start_date=start_date,
-                                                               end_date=end_date)
+            code, tweets, full_data = fetch_tweet_data(username,
+                                                       start_date=start_date,
+                                                       end_date=end_date,
+                                                       replies=replies)
             if code != 200:
                 error_json["msg"] = tweets
                 return make_response(jsonify(error_json), 400)
@@ -127,9 +135,10 @@ class LiveScrap(Resource):
             username = args['username']
             action = args['action']
             model = args['model']
+            replies = args['consider_replies']
 
             if action == 'start':
-                db_response, status_code = insert_live_scraping(username, model)
+                db_response, status_code = insert_live_scraping(username, model, replies)
                 return db_response, status_code
             else:
                 db_response, status_code = delete_live_scraping(username, model)
@@ -166,7 +175,7 @@ class ScrapResults(Resource):
             show_all = args['show_all']
             logger.info(show_all)
 
-            result = fetch_twitter_data(username, model, show_all, limit)
+            result = get_tweet_results(username, model, show_all, limit)
 
             return result
 
