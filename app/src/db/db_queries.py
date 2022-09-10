@@ -18,7 +18,7 @@ LAST_VIEW_QUERY = """select max(last_viewed_time) as last_view_time
 from live_scraping_details 
 where username='{username}' and model='{model}'"""
 
-FETCH_QUERY = """select username, model, date, text, prediction 
+FETCH_QUERY = """select username, model, date, text, prediction, tweet_author 
 from twitter_data where username='{username}' 
 and model='{model}'"""
 
