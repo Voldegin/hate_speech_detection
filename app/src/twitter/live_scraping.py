@@ -39,7 +39,7 @@ def live_scraping():
         else:
             last_scrapped_time = each_row["last_scrapped_time"]
 
-        if last_scrapped_time and not replies:
+        if last_scrapped_time and replies == 'False':
             start_date = last_scrapped_time
 
         logger.info("Live scraping for username: " + username)
