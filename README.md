@@ -1,2 +1,2 @@
-# hate_speech_detection
+# Hate Speech Detection
 Project Work
