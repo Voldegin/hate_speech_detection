@@ -70,6 +70,7 @@ def fetch_tweet_data(username, start_date=None, end_date=None, replies=False):
         tweets_df = pd.DataFrame(columns=columns)
         return 200, tweets_df['tweet'].tolist(), tweets_df[columns]
     if replies:
+        # Fetch Replies from twitter based on conversation id
         reply_code, reply_tweets_df = condition_based_scraping(username,
                                                                start_date=start_date,
                                                                end_date=end_date,

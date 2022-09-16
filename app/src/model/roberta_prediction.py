@@ -26,7 +26,6 @@ def map_example_to_dict(input_ids, attention_masks, label):
 
 
 def encode_examples(ds, tokenizer, limit=-1):
-    # prepare list, so that we can build up final TensorFlow dataset from slices
     input_ids_list = []
     attention_mask_list = []
     label_list = []
@@ -68,7 +67,6 @@ def roberta_prediction(input_text, model_config, preprocess=True,
 
     predictions = model.predict(ds_encoded).logits
 
-    # transform to array with probabilities
     res = tf.nn.softmax(predictions, axis=1).numpy()
 
     if return_one:

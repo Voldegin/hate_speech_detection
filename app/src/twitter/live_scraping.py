@@ -44,6 +44,8 @@ def live_scraping():
 
         logger.info("Live scraping for username: " + username)
         logger.info("Username: " + username)
+
+        # Get tweets from Twitter
         code, tweets, full_data = fetch_tweet_data(username,
                                                    start_date=start_date,
                                                    replies=replies)

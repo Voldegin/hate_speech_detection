@@ -11,6 +11,7 @@ from log import logger
 class ShowModels(Resource):
     def get(self):
         try:
+            # Show all Model names
             model_names = [x["name"] for x in MODEL_LIST]
             return model_names
 

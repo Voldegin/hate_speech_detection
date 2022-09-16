@@ -75,6 +75,7 @@ class ConditionBased(Resource):
             raw_end_date = args['end_date']
             replies = args['consider_replies']
 
+            # Adding 1 day to get today's results as well
             today = datetime.today() + timedelta(days=1)
 
             if raw_start_date:
@@ -102,6 +103,7 @@ class ConditionBased(Resource):
             model_func = model_details["function"]
             model_config = model_details["config"]
 
+            # Get tweets from Twitter
             code, tweets, full_data = fetch_tweet_data(username,
                                                        start_date=start_date,
                                                        end_date=end_date,
@@ -113,6 +115,7 @@ class ConditionBased(Resource):
             if len(tweets) == 0:
                 return "No tweets found for the give parameters", 200
 
+            # Call model function with text and model config
             predictions = model_func(input_text=tweets,
                                      model_config=model_config)
 
@@ -138,9 +141,11 @@ class LiveScrap(Resource):
             replies = args['consider_replies']
 
             if action == 'start':
+                # Insert entry into DB
                 db_response, status_code = insert_live_scraping(username, model, replies)
                 return db_response, status_code
             else:
+                # Delete entry from DB
                 db_response, status_code = delete_live_scraping(username, model)
                 return db_response, status_code
 
@@ -175,6 +180,7 @@ class ScrapResults(Resource):
             show_all = args['show_all']
             logger.info(show_all)
 
+            # Fetch Results from Database
             result = get_tweet_results(username, model, show_all, limit)
 
             return result

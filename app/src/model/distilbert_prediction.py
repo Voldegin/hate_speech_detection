@@ -13,7 +13,6 @@ def distilbert_prediction(input_text, model_config, preprocess=True,
     if type(input_text) is not list:
         input_text = [input_text]
 
-    # tokenize the text
     if preprocess:
         new_list = []
         for each_text in input_text:
@@ -23,12 +22,11 @@ def distilbert_prediction(input_text, model_config, preprocess=True,
     encodings = tokenizer(new_list,
                           truncation=True,
                           padding=True)
-    # transform to tf.Dataset
+
     dataset = tf.data.Dataset.from_tensor_slices((dict(encodings)))
-    # predict
+
     predictions = model.predict(dataset.batch(1)).logits
 
-    # transform to array with probabilities
     res = tf.nn.softmax(predictions, axis=1).numpy()
 
     if return_one:

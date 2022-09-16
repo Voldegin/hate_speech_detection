@@ -37,6 +37,7 @@ class CheckText(Resource):
             model_func = model_details["function"]
             model_config = model_details["config"]
 
+            # Call model function with text and model config
             result = model_func(input_text=text, model_config=model_config)
             prediction = result[0]
 
